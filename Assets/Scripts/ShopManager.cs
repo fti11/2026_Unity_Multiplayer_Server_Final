@@ -1,3 +1,4 @@
+using System;
 using Firebase.Database;
 using Newtonsoft.Json;
 using PimDeWitte.UnityMainThreadDispatcher;
@@ -6,6 +7,14 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
+
+[Serializable]
+public class UnitDataList
+{
+    public bool Unit2;
+    public bool Unit3;
+    public bool Unit4;
+}
 public class ShopManager : MonoBehaviour
 {
     FirebaseDatabase database;
@@ -18,6 +27,13 @@ public class ShopManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] Text CoinText;
     [SerializeField] Text MessageText;
+
+    [Header("Unit UI")]
+    [SerializeField] int unit2Price = 300;
+    [SerializeField] int unit3Price = 300;
+    [SerializeField] int unit4Price = 300;
+
+    private UnitDataList myUnitList = new UnitDataList();
 
     string userKey;
     int currentCoin;
@@ -69,12 +85,83 @@ public class ShopManager : MonoBehaviour
                 string inventoryJson = snapshot.Child("Inventory").Value.ToString();
                 inventory = JsonConvert.DeserializeObject<Dictionary<string, int>>(inventoryJson);
 
+                LoadUnitData(userKey);
+
                 dispatcher.Enqueue(() =>
                 {
                     RefreshUI();
                     MessageText.text = "유저 정보 불러오기 완료";
                 });
             });
+    }
+
+    void LoadUnitData(string userKey)
+    {
+        reference.Child("UserInfo").Child(userKey).Child("UnitList").GetValueAsync().ContinueWith(task =>
+        {
+            if (task.IsCompleted && !task.IsFaulted)
+            {
+                DataSnapshot snapshot = task.Result;
+                if (snapshot != null && snapshot.Value != null)
+                {
+                    string jsonStr = snapshot.Value.ToString();
+                    myUnitList = JsonUtility.FromJson<UnitDataList>(jsonStr);
+                }
+                else
+                {
+                    myUnitList = new UnitDataList { Unit2 = false, Unit3 = false, Unit4 = false };
+                }
+            }
+        });
+    }
+
+    public void BuyUnit(int unitId)
+    {
+        int price = 0;
+        bool isAlreadyOwned = false;
+
+        if (unitId == 2) { price = unit2Price; isAlreadyOwned = myUnitList.Unit2; }
+        else if (unitId == 3) { price = unit3Price; isAlreadyOwned = myUnitList.Unit3; }
+        else if (unitId == 4) { price = unit4Price; isAlreadyOwned = myUnitList.Unit4; }
+
+        if (isAlreadyOwned)
+        {
+            MessageText.text = $"Unit {unitId}는 이미 보유한 유닛입니다!";
+            return;
+        }
+
+        if (currentCoin < price)
+        {
+            MessageText.text = "코인이 부족합니다.";
+            return;
+        }
+
+        currentCoin -= price;
+        if (unitId == 2) myUnitList.Unit2 = true;
+        else if (unitId == 3) myUnitList.Unit3 = true;
+        else if (unitId == 4) myUnitList.Unit4 = true;
+
+        RefreshUI();
+
+        SaveUnitAndCoinData();
+    }
+
+    void SaveUnitAndCoinData()
+    {
+        string userKey = PlayerPrefs.GetString("UserKey");
+        if (string.IsNullOrEmpty(userKey)) return;
+
+        string unitJson = JsonUtility.ToJson(myUnitList);
+
+        reference.Child("UserInfo").Child(userKey).Child("Coin").SetValueAsync(currentCoin);
+        reference.Child("UserInfo").Child(userKey).Child("UnitList").SetValueAsync(unitJson).ContinueWith(task =>
+        {
+            dispatcher.Enqueue(() =>
+            {
+                if (task.IsCompleted) MessageText.text = "유닛 구매 성공!";
+                else MessageText.text = "서버 저장 실패";
+            });
+        });
     }
 
     void RefreshUI()
