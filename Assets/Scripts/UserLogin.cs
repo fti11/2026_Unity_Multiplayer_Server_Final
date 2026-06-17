@@ -28,6 +28,16 @@ public class UserLogin : MonoBehaviour
         dispatcher = UnityMainThreadDispatcher.Instance();
     }
 
+    public void OnClickGoToShop()
+    {
+        SceneManager.LoadScene("ShopScene");
+    }
+
+    public void OnClickGoToInventory()
+    {
+        SceneManager.LoadScene("InventoryScene");
+    }
+
     public void OnClickLogin()
     {
         string nickName = NickNameInput.text.Trim();

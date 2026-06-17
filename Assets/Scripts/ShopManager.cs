@@ -4,6 +4,7 @@ using PimDeWitte.UnityMainThreadDispatcher;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class ShopManager : MonoBehaviour
 {
@@ -37,6 +38,11 @@ public class ShopManager : MonoBehaviour
         }
 
         LoadUserData();
+    }
+
+    public void OnClickGoToMain()
+    {
+        SceneManager.LoadScene("LoginScene");
     }
 
     void LoadUserData()
@@ -76,19 +82,19 @@ public class ShopManager : MonoBehaviour
         CoinText.text = "Coin : " + currentCoin;
     }
 
-    public void OnClickBuyEnergyDrink()
+    public void OnClickBuyCoke()
     {
-        BuyItem("EnergyDrink", 120);
+        BuyItem("Coke", 80);
     }
 
-    public void OnClickBuyShield()
+    public void OnClickBuyHelmet()
     {
-        BuyItem("Shield", 250);
+        BuyItem("Helmet", 150);
     }
 
-    public void OnClickBuyMagicStone()
+    public void OnClickBuyBurger()
     {
-        BuyItem("MagicStone", 400);
+        BuyItem("MagicStone", 220);
     }
 
     void BuyItem(string itemName, int price)

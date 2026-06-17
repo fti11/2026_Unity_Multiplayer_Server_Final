@@ -4,6 +4,7 @@ using PimDeWitte.UnityMainThreadDispatcher;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class InventoryManager : MonoBehaviour
 {
@@ -15,9 +16,9 @@ public class InventoryManager : MonoBehaviour
     [SerializeField] string databaseUrl = "https://final-ada3c-default-rtdb.asia-southeast1.firebasedatabase.app/";
 
     [Header("UI")]
-    [SerializeField] Text EnergyDrinkCountText;
-    [SerializeField] Text ShieldCountText;
-    [SerializeField] Text MagicStoneCountText;
+    [SerializeField] Text CokeCountText;
+    [SerializeField] Text HelmetCountText;
+    [SerializeField] Text BurgerCountText;
     [SerializeField] Text MessageText;
 
     string userKey;
@@ -38,6 +39,11 @@ public class InventoryManager : MonoBehaviour
         }
 
         LoadInventory();
+    }
+
+    public void OnClickGoToMain()
+    {
+        SceneManager.LoadScene("LoginScene");
     }
 
     void LoadInventory()
@@ -82,9 +88,9 @@ public class InventoryManager : MonoBehaviour
 
     void RefreshUI()
     {
-        EnergyDrinkCountText.text = "EnergyDrink : " + GetItemCount("EnergyDrink");
-        ShieldCountText.text = "Shield : " + GetItemCount("Shield");
-        MagicStoneCountText.text = "MagicStone : " + GetItemCount("MagicStone");
+        CokeCountText.text = "Coke : " + GetItemCount("Coke");
+        HelmetCountText.text = "Helmet : " + GetItemCount("Helmet");
+        BurgerCountText.text = "Burger : " + GetItemCount("Burger");
     }
 
     int GetItemCount(string itemName)
@@ -97,19 +103,19 @@ public class InventoryManager : MonoBehaviour
         return 0;
     }
 
-    public void OnClickUseEnergyDrink()
+    public void OnClickUseCoke()
     {
-        UseItem("EnergyDrink");
+        UseItem("Coke");
     }
 
-    public void OnClickUseShield()
+    public void OnClickUseHelmet()
     {
-        UseItem("Shield");
+        UseItem("Helmet");
     }
 
-    public void OnClickUseMagicStone()
+    public void OnClickUseBurger()
     {
-        UseItem("MagicStone");
+        UseItem("Burger");
     }
 
     void UseItem(string itemName)
@@ -128,12 +134,12 @@ public class InventoryManager : MonoBehaviour
     {
         switch (itemName)
         {
-            case "EnergyDrink":
-                return "EnergyDrink를 마셔 기운을 회복했습니다.";
-            case "Shield":
-                return "Shield를 장착해 방어력이 상승했습니다.";
-            case "MagicStone":
-                return "MagicStone을 사용해 마력을 충전했습니다.";
+            case "Coke":
+                return "시원한 Coke를 마셔 목마름을 해소했습니다!";
+            case "Helmet":
+                return "단단한 Helmet을 착용해 머리를 보호합니다.";
+            case "Burger":
+                return "맛있는 Burger를 먹어 체력을 든든하게 회복했습니다!";
             default:
                 return itemName + " 사용 완료";
         }
