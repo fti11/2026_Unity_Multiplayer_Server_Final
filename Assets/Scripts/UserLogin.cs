@@ -38,6 +38,11 @@ public class UserLogin : MonoBehaviour
         SceneManager.LoadScene("InventoryScene");
     }
 
+    public void OnClickGoToGameResult()
+    {
+        SceneManager.LoadScene("GameResultScene");
+    }
+
     public void OnClickLogin()
     {
         string nickName = NickNameInput.text.Trim();
